@@ -1,0 +1,49 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Budget Pace</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f2f2f7;margin:0;padding:20px}
+.card{max-width:420px;margin:auto;background:#fff;border-radius:18px;padding:20px;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+input,button{width:100%;padding:12px;margin:8px 0;border-radius:12px;font-size:17px;border:1px solid #ccc;box-sizing:border-box}
+button{background:#007AFF;color:#fff;border:none}
+.row{display:flex;justify-content:space-between;margin:10px 0}
+canvas{width:100%;height:220px;border:1px solid #eee;border-radius:12px;margin-top:16px}
+</style>
+</head><body>
+<div class="card">
+<h2>💰 Budget Pace</h2>
+<label>Monthly Budget</label>
+<input id="b" type="number" value="3000">
+<label>Month-to-Date Spending</label>
+<input id="s" type="number" placeholder="Enter amount">
+<button onclick="go()">Calculate</button>
+<div id="r" style="display:none">
+<div class="row"><span>Ideal by today</span><b id="i"></b></div>
+<div class="row"><span>Projected month-end</span><b id="p"></b></div>
+<div class="row"><span>Status</span><b id="st"></b></div>
+<canvas id="c" width="360" height="220"></canvas>
+</div>
+</div>
+<script>
+function m(n){return "$"+Math.round(n).toLocaleString()}
+function go(){
+let b=+bEl.value,s=+sEl.value;
+if(!s){alert("Enter spending");return;}
+localStorage.b=b; localStorage.s=s;
+let d=new Date(),day=d.getDate(),days=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+let ideal=b*day/days,proj=s/day*days;
+i.textContent=m(ideal); p.textContent=m(proj);
+let diff=ideal-s;
+st.textContent=(diff>=0?"✅ "+m(diff)+" under pace":"🔴 "+m(-diff)+" over pace");
+r.style.display="block";
+let x=c.getContext("2d");x.clearRect(0,0,360,220);
+x.strokeStyle="#ddd";x.beginPath();x.moveTo(30,190);x.lineTo(330,30);x.stroke();
+x.strokeStyle="#007AFF";x.lineWidth=3;x.beginPath();x.moveTo(30,190);x.lineTo(30+300*day/days,190-160*s/b);x.stroke();
+}
+const bEl=document.getElementById("b"),sEl=document.getElementById("s"),i=document.getElementById("i"),p=document.getElementById("p"),st=document.getElementById("st"),r=document.getElementById("r"),c=document.getElementById("c");
+if(localStorage.b)bEl.value=localStorage.b;
+if(localStorage.s)sEl.value=localStorage.s;
+</script>
+</body></html>
